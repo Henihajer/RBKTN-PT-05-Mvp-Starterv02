@@ -123,3 +123,14 @@ padding: 20px 50px;}
     padding: 6px 12px;
     cursor: pointer;
   }
+  .thumbnail {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 10px;
+  }
+  
+  tr:hover .thumbnail {
+    display: block;
+  }

@@ -48,11 +48,17 @@ const App = () => {
     }
   };
   
-  const data={designation,price,resultat,image,client}
+  const data={
+    design_an:designation,
+    price_an:price,
+    resultat:resultat,
+    image: image,
+    Client: client,}
+  
   const add =  () => { 
-    axios.post("/api/items/",{designation,price,resultat,image,client})
+    axios.post("http://localhost:3000/api/items/add",data)
       .then((res) => {
-        console.log("OK")
+        setreload(!reload)
       })
       .catch((err) => {
         console.log(designation,price,resultat,image,client)
@@ -73,13 +79,11 @@ const App = () => {
   const modify = (id) => {
     const formData = new FormData();
     formData.append('file', image);
-    formData.append('upload_preset', 'heni123'); // Replace with your Cloudinary upload preset
+    formData.append('upload_preset', 'heni123'); 
   
-    // Upload the image to Cloudinary
-    axios.post('https://api.cloudinary.com/v1_1/dtuvwldom/image/upload', formData)
+      axios.post('https://api.cloudinary.com/v1_1/dtuvwldom/image/upload', formData)
       .then((response) => {
-        // Once the image is uploaded, update the item with the new image URL and the updated 'resultat'
-        const updatedItem = {
+          const updatedItem = {
           resultat: resultat,
           image: response.data.secure_url,
         };
@@ -111,7 +115,9 @@ const App = () => {
         </nav>
       </div>
       {showApropos && <Apropos />}
-      {showListeanal && (<Listeanal />
+      {showListeanal && (<Listeanal  List={List} items={items} designation={designation} price={price} resultat={resultat} image={image} client={client} date1={date1} setdesignation={setdesignation} setprice={setprice}
+          setresultat={setresultat} setimage={setimage}  setclient={setclient} setdate={setdate} remove={remove} modify={modify} add={add} setreload={setreload} reload={reload} search={search}
+        show={show} setshow={setshow}  />
       )}
       {showSuivianal && (<Suivianal List={List} items={items} designation={designation} price={price} resultat={resultat} image={image} client={client} date1={date1} setdesignation={setdesignation} setprice={setprice}
           setresultat={setresultat} setimage={setimage}  setclient={setclient} setdate={setdate} remove={remove} modify={modify} add={add} setreload={setreload} reload={reload} search={search}
@@ -124,29 +130,28 @@ const App = () => {
 }
 
 const Suivianal = ({ List,items,designation,price,resultat,image,client,date1, setdesignation, setprice, setresultat, setimage, setclient, setdate,add,remove, modify,show,setshow,reload,setreload,search }) => {
-const uploadimage=async ()=>{
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'heni123'); // Replace with your Cloudinary upload preset
-
-      const response = await axios.post('https://api.cloudinary.com/v1_1/dtuvwldom/image/upload', formData);
-
-}
 return(
   <div>
     <List items={items} />
-    <h2>Recherche des Analyses</h2>
-    <input placeholder='Chercher une analyse' onChange={(e) => search(e.target.value)}></input>   
     <h2>Ajout des Analyses</h2>
     <input placeholder="Designation" value={designation} onChange={(e) => setdesignation(e.target.value)} />
     <input placeholder="Prix" value={price} onChange={(e) => setprice(e.target.value)} />
     <input placeholder="Resultat" value={resultat} onChange={(e) => setresultat(e.target.value)} />
-    <input placeholder="Image" type="file" value={image} onChange={(e) => setimage(e.target.value)} />
+    <input placeholder="Image"  value={image} onChange={(e) => setimage(e.target.value)} />
     <input placeholder="Client" value={client} onChange={(e) => setclient(e.target.value)} />
     
     <button onClick={() => add( )}>Add</button>
-
-    <h2>Liste des Analyses</h2>
+    <br></br>
+    
+  </div>)};
+const Listeanal = ({ List,items,designation,price,resultat,image,client,date1, setdesignation, setprice, setresultat, setimage, setclient, setdate,add,remove, modify,show,setshow,reload,setreload,search }) => {
+  
+  return (
+    <div>
+       <h2>Recherche des Analyses</h2>
+    <input placeholder='Chercher une analyse' onChange={(e) => search(e.target.value)}></input>   
+   
+        <h2>Liste des Analyses</h2>
     <table>
         <thead>
           <tr>
@@ -167,7 +172,7 @@ return(
               <td>{item.price_an}</td>
               <td>{item.Client}</td>
               <td>{item.resultat}</td>
-              <td>{item.image}<img src={item.image} alt="Analyse Image" /></td>
+              <td>{item.image} <img src={item.image} alt="Analyse Image" /></td>
               <td>
               
               <button onClick={() => remove(item.idanalyse)}>Delete</button>
@@ -183,65 +188,8 @@ return(
           ))}
         </tbody>
       </table>
-    <br></br>
-    
-  </div>)};
-const Listeanal = () => {
-  const [images, setImages] = useState([]);
-  const [file, setFile] = useState(null);
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-  const handleImageDelete = (index) => {
-    // Create a new array without the image URL at the specified index
-    const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
-  };
-  const handleImageUpload = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'heni123'); // Replace with your Cloudinary upload preset
-
-      const response = await axios.post('https://api.cloudinary.com/v1_1/dtuvwldom/image/upload', formData);
-
-      // Update the images state with the new image URL
-      setImages([...images, response.data.secure_url]);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-    }
-  };
-
-  return (
-    <div>
-      <h2>Image Upload</h2>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleImageUpload}>Upload</button>
-
-      <h2>Uploaded Images</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {images.map((imageUrl, index) => (
-            <tr key={index}>
-              <td>
-                <img src={imageUrl} alt={`Image ${index + 1}`} width="100" />
-              </td>
-              <td>
-                <button onClick={() => handleImageDelete(index)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
-  );
+  )
 };
 
 
@@ -280,7 +228,7 @@ const Contact=()=>(
                 </div>
                 <label for="message">message</label>
                 <textarea name="message" id="message" rows="10"></textarea>
-                <input type="submit" value="ENVOYER" class="cta" />
+                <input type="submit" value="ENVOYER" className="cta" />
             </form>
         </div>);
 
